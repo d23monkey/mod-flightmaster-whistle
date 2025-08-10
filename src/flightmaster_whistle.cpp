@@ -83,11 +83,11 @@ void FlightmasterWhistle::TeleportToNearestFlightmaster(Player* player) const
 
     if (lastTime > 0 && diff < GetTimer() && !player->IsGameMaster())
     {
-        SendPlayerMessage(player, "Please try again in " + FlightmasterWhistle::FormatTimer(GetTimer() - diff) + ".");
+        SendPlayerMessage(player, "请在 " + FlightmasterWhistle::FormatTimer(GetTimer() - diff) + " 后再次尝试.");
         return;
     }
 
-    SendPlayerMessage(player, "Teleporting to nearest flightmaster...");
+    SendPlayerMessage(player, "正在传送到最近的飞行管理员");
 
     if (HandleTeleport(player))
         timerMap[player->GetGUID().GetCounter()] = currentTime;
@@ -104,7 +104,7 @@ void FlightmasterWhistle::TeleportToNearestFlightmaster(Player* player) const
 /*static*/ std::string FlightmasterWhistle::FormatTimer(const uint32 ms)
 {
     std::chrono::hh_mm_ss time{ std::chrono::milliseconds(ms) };
-    return Acore::ToString(time.minutes().count()) + " minutes and " + Acore::ToString(time.seconds().count()) + " seconds";
+    return Acore::ToString(time.minutes().count()) + " 分 " + Acore::ToString(time.seconds().count()) + " 秒";
 }
 
 bool FlightmasterWhistle::HandleTeleport(Player* player) const
@@ -114,37 +114,37 @@ bool FlightmasterWhistle::HandleTeleport(Player* player) const
 
     if (!GetEnabled())
     {
-        SendPlayerMessage(player, "Can't do this yet.");
+        SendPlayerMessage(player, "还不能这么做.");
         return false;
     }
 
     if (player->GetLevel() < GetMinPlayerLevel())
     {
-        SendPlayerMessage(player, "You need to be at least level " + Acore::ToString(GetMinPlayerLevel()) + " to use this.");
+        SendPlayerMessage(player, "你需要达到至少 " + Acore::ToString(GetMinPlayerLevel()) + " 级才能使用这个功能.");
         return false;
     }
 
     if (!player->IsAlive())
     {
-        SendPlayerMessage(player, "Can't do this while dead.");
+        SendPlayerMessage(player, "死亡状态下无法执行此操作.");
         return false;
     }
 
     if (player->IsInCombat())
     {
-        SendPlayerMessage(player, "Can't do this while in combat.");
+        SendPlayerMessage(player, "战斗中无法执行此操作.");
         return false;
     }
 
     if (EnemiesNearby(player))
     {
-        SendPlayerMessage(player, "Can't do this while enemy players are nearby.");
+        SendPlayerMessage(player, "附近有敌方玩家时无法执行此操作.");
         return false;
     }
 
     if (player->InArena())
     {
-        SendPlayerMessage(player, "Can't do this while in arena.");
+        SendPlayerMessage(player, "在竞技场中无法执行此操作.");
         return false;
     }
 
@@ -152,14 +152,14 @@ bool FlightmasterWhistle::HandleTeleport(Player* player) const
     ASSERT(map != nullptr);
     if (map->Instanceable())
     {
-        SendPlayerMessage(player, "Can't do this while in an instanced area.");
+        SendPlayerMessage(player, "在副本中无法执行此操作.");
         return false;
     }
 
     const CreatureSpawnInfo* nearestFm = ChooseNearestSpawnInfo(player);
     if (nearestFm == nullptr)
     {
-        SendPlayerMessage(player, "No flightmaster found in your current area.");
+        SendPlayerMessage(player, "当前区域未找到飞行管理员.");
         return false;
     }
 
@@ -212,7 +212,7 @@ bool FlightmasterWhistle::EnemiesNearby(const Player* player, float range) const
     std::list<Player*> targets;
     Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(player, player, range);
     Acore::PlayerListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(player, targets, u_check);
-    Cell::VisitAllObjects(player, searcher, range);
+    Cell::VisitObjects(player, searcher, range);
 
     return !targets.empty();
 }
